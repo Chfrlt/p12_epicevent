@@ -1,11 +1,12 @@
 from django.contrib.auth.hashers import make_password
 from rest_framework.serializers import ModelSerializer
 from django.contrib.auth.password_validation import validate_password
-from rest_framework import serializers
 
 from .models import User
+from .models import Event, Client, Contract
 
-class RegisterSerializer(serializers.ModelSerializer):
+
+class RegisterSerializer(ModelSerializer):
 
     class Meta:
         model = User
@@ -42,3 +43,42 @@ class UserListSerializer(ModelSerializer):
         model = User
         fields = ['id', 'username', 'role']
         extra_kwargs = {'password': {'write_only': True}}
+
+
+
+class ClientDetailSerializer(ModelSerializer):
+    class Meta:
+        model = Client
+        fields = "__all__"
+
+
+class ClientListSerializer(ModelSerializer):
+
+    class Meta:
+        model = Client
+        fields = ['id', 'company_name', 'email', 'sales_contact']
+
+
+class ContractDetailSerializer(ModelSerializer):
+    class Meta:
+        model = Contract
+        fields = "__all__"
+
+
+class ContractListSerializer(ModelSerializer):
+    class Meta:
+        model = Contract
+        fields = ["id", "client", "contract_status"]
+
+
+class EventDetailSerializer(ModelSerializer):
+    class Meta:
+        model = Event
+        fields = "__all__"
+
+
+class EventListSerializer(ModelSerializer):
+    class Meta:
+        model = Event
+        fields = ["id", "contract", "support_contact", "event_status"]
+
