@@ -6,7 +6,7 @@ from rest_framework import filters
 from rest_framework.exceptions import APIException
 
 from .models import Client, Contract
-from .serializers import ClientDetailSerializer, ClientListSerializer
+from .serializers import RegisterSerializer, ClientDetailSerializer, ClientListSerializer
 
 
 class RegisterAPIView(APIView):
