@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser, PermissionsMixin, BaseUserManager
 
 
@@ -62,3 +63,46 @@ class User(AbstractUser, PermissionsMixin):
 
     def has_module_perms(self, app_label):
         return True
+
+
+class Client(models.Model):
+    sales_contact = models.ForeignKey(
+        to=settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        limit_choices_to={"role": 2})
+    first_name = models.CharField(max_length=25)
+    last_name = models.CharField(max_length=25)
+    email = models.EmailField(max_length=100)
+    phone = models.CharField(max_length=20, blank=True, null=True)
+    mobile = models.CharField(max_length=20, blank=True, null=True)
+    company_name = models.CharField(max_length=250, blank=True, null=True)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_updated = models.DateTimeField(auto_now=True)
+    client_status = models.BooleanField(default=False, verbose_name="Contracted")
+
+class Contract(models.Model):
+    client = models.ForeignKey(to='Client', on_delete=models.PROTECT)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_updated = models.DateTimeField(auto_now=True)
+    contract_status = models.BooleanField(default=False)
+    amount = models.FloatField()
+    payment_due = models.DateTimeField(auto_now_add=True)
+
+
+class Event(models.Model):
+    contract = models.ForeignKey(to='Contract', on_delete=models.PROTECT)
+    support_contact = models.ForeignKey(
+        to=settings.AUTH_USER_MODEL,
+        blank=True,
+        null=True,
+        on_delete=models.PROTECT,
+        limit_choices_to={"role": 3},
+    )
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_updated = models.DateTimeField(auto_now=True)
+    event_status = models.BooleanField(default=False)
+    attendees = models.IntegerField()
+    event_date = models.DateTimeField()
+    notes = models.TextField(max_length=200, blank=True)
