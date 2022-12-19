@@ -4,6 +4,7 @@ from .views import RegisterAPIView
 
 
 urlpatterns = [
+    path('signup/', RegisterAPIView.as_view()),
     path(
         'login/', jwt_views.TokenObtainPairView.as_view(),
         name='login'
