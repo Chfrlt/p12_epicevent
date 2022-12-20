@@ -6,7 +6,8 @@ from rest_framework import filters
 from rest_framework.exceptions import APIException
 
 from .models import Client, Contract
-from .serializers import RegisterSerializer, ClientDetailSerializer, ClientListSerializer
+from .serializers import (RegisterSerializer, ClientDetailSerializer,
+                          ClientListSerializer)
 
 
 class RegisterAPIView(APIView):
@@ -35,7 +36,7 @@ class ClientViewset(DualSerializerViewSet, ModelViewSet):
     serializer_class = ClientListSerializer
     detail_serializer_class = ClientDetailSerializer
     filterset_fields = ["client_status"]
-    search_fields = ["company_name", "=sales_contact"]
+    search_fields = ["company_name", "=client__sales_contact"]
 
     def get_queryset(self):
         if self.request.user.role == 2:
