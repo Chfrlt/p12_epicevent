@@ -1,14 +1,14 @@
-from rest_framework import permissions, status
+from rest_framework import permissions, status, filters
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
-from rest_framework import filters
 from rest_framework.exceptions import APIException
 
 from .models import Client, Contract
 from .serializers import (RegisterSerializer, ClientDetailSerializer,
                           ClientListSerializer, ContractDetailSerializer,
-                          ContractListSerializer)
+                          ContractListSerializer, EventDetailSerializer,
+                          EventListSerializer)
 
 
 class RegisterAPIView(APIView):
@@ -97,3 +97,20 @@ class ContractViewset(DualSerializerViewSet, ModelViewSet):
             serialized_data.save()
 
         return Response(serialized_data.data)
+
+
+class EventViewset(DualSerializerViewSet, ModelViewSet):
+
+    serializer_class = EventListSerializer
+    detail_serializer_class = EventDetailSerializer
+    #TODO: add filter & search fileds
+
+    def get_queryset(self):
+        user = self.request.user
+
+        if self.action == "list" and not user.is_superuser:
+            queryset = Event.objects.filter(support_contact=user)
+        else:
+            queryset = Event.objects.all()        
+
+        return queryset
