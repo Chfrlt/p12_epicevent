@@ -7,7 +7,8 @@ from rest_framework.exceptions import APIException
 
 from .models import Client, Contract
 from .serializers import (RegisterSerializer, ClientDetailSerializer,
-                          ClientListSerializer)
+                          ClientListSerializer, ContractDetailSerializer,
+                          ContractListSerializer)
 
 
 class RegisterAPIView(APIView):
@@ -49,3 +50,50 @@ class ClientViewset(DualSerializerViewSet, ModelViewSet):
         else:
             queryset = Client.objects.all()
         return queryset
+
+
+class ContractViewset(DualSerializerViewSet, ModelViewSet):
+    serializer_class = ContractListSerializer
+    detail_serializer_class = ContractDetailSerializer
+    filterset_fields = ['contract_status']
+
+    def get_queryset(self):
+        user = self.request.user
+
+        if self.action == "list" and not user.is_superuser:
+            client = Client.objects.filter(sales_contact=user)
+            if client:
+                queryset = Contract.objects.filter(client__in=client)
+            else:
+                raise APIException("Aucun contrat trouvé")
+        else:
+            queryset = Contract.objects.all()
+
+        return queryset
+
+
+    def create(self, request):
+        data = request.data.copy()
+        data['client_status'] = True
+
+        serialized_data = self.detail_serializer_class(data=data)
+        serialized_data.is_valid(raise_exception=True)
+        serialized_data.save()
+
+        client = get_object_or_404(Client, pk=serialized_data.data.get('client'))
+        if client.sales_contact is None and self.request.user.role == 2:
+            client.sales_contact = request.user
+            client.save()
+
+        return Response(serialized_data.data)
+
+    def update(self, request, pk=None):
+        
+        contract = get_object_or_404(Contract, pk=pk)
+
+        if contract.client.sales_contact == self.request.user:
+            serialized_data = self.detail_serializer_class(contract, data=request.data, partial=True)
+            serialized_data.is_valid(raise_exception=True)
+            serialized_data.save()
+
+        return Response(serialized_data.data)
