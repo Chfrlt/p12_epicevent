@@ -1,10 +1,12 @@
+from django.shortcuts import get_object_or_404
 from rest_framework import permissions, status, filters
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.exceptions import APIException
 
-from .models import Client, Contract
+
+from .models import Client, Contract, Event
 from .serializers import (RegisterSerializer, ClientDetailSerializer,
                           ClientListSerializer, ContractDetailSerializer,
                           ContractListSerializer, EventDetailSerializer,
@@ -14,6 +16,7 @@ from .serializers import (RegisterSerializer, ClientDetailSerializer,
 class RegisterAPIView(APIView):
     serializer_class = RegisterSerializer
     permission_classes = [permissions.IsAdminUser()]
+    permission_classes = [permissions.IsAdminUser]
 
     def post(self, request):
         serializer = RegisterSerializer(data=request.data)
