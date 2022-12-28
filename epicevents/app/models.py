@@ -4,7 +4,7 @@ from django.contrib.auth.models import AbstractUser, PermissionsMixin, BaseUserM
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, username, email, role, password=None):
+    def create_user(self, username, email, role=1, password=None):
         if not username:
             raise ValueError("Entrer un nom d'utilisateur")
         if not role:
@@ -81,6 +81,7 @@ class Client(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
     client_status = models.BooleanField(default=False, verbose_name="Contracted")
+
 
 class Contract(models.Model):
     client = models.ForeignKey(to='Client', on_delete=models.PROTECT)
