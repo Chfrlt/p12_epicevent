@@ -2,8 +2,7 @@ from django.contrib.auth.hashers import make_password
 from rest_framework.serializers import ModelSerializer
 from django.contrib.auth.password_validation import validate_password
 
-from .models import User
-from .models import Event, Client, Contract
+from .models import User, Event, Client, Contract
 
 
 class RegisterSerializer(ModelSerializer):
@@ -56,7 +55,7 @@ class ClientListSerializer(ModelSerializer):
 
     class Meta:
         model = Client
-        fields = ['id', 'company_name', 'email', 'sales_contact']
+        fields = ['id', 'company_name', 'email', 'sales_contact', 'client_status']
 
 
 class ContractDetailSerializer(ModelSerializer):
