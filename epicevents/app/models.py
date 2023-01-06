@@ -75,8 +75,8 @@ class Client(models.Model):
     first_name = models.CharField(max_length=25)
     last_name = models.CharField(max_length=25)
     email = models.EmailField(max_length=100)
-    phone = models.CharField(max_length=20, blank=True, null=True)
-    mobile = models.CharField(max_length=20, blank=True, null=True)
+    phone = models.CharField(max_length=20, blank=True, null=False)
+    mobile = models.CharField(max_length=20, blank=True, null=False)
     company_name = models.CharField(max_length=250, blank=False)
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
@@ -89,7 +89,7 @@ class Contract(models.Model):
     date_updated = models.DateTimeField(auto_now=True)
     contract_status = models.BooleanField(default=False)
     amount = models.FloatField()
-    payment_due = models.DateTimeField(auto_now_add=True)
+    payment_due = models.DateTimeField()
 
 
 class Event(models.Model):
