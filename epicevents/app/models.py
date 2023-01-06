@@ -96,10 +96,9 @@ class Event(models.Model):
     contract = models.ForeignKey(to='Contract', on_delete=models.PROTECT)
     support_contact = models.ForeignKey(
         to=settings.AUTH_USER_MODEL,
-        blank=True,
-        null=True,
-        on_delete=models.PROTECT,
+        on_delete=models.SET_NULL,
         limit_choices_to={"role": 3},
+        null=True,
     )
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
