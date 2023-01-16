@@ -43,7 +43,7 @@ class ClientViewset(DualSerializerViewSet, ModelViewSet):
     permission_classes = [IsAuthenticated, IsManager | ClientPermissions]
     detail_serializer_class = ClientDetailSerializer
     filterset_fields = ["client_status"]
-    search_fields = ["company_name", "=client__sales_contact"]
+    search_fields = ["=company_name", "=last_name"]
 
     def get_queryset(self):
         if self.request.user.role == 2:
@@ -106,6 +106,7 @@ class ContractViewset(DualSerializerViewSet, ModelViewSet):
     permission_classes = [IsAuthenticated, IsManager | ContractPermissions]
     detail_serializer_class = ContractDetailSerializer
     filterset_fields = ['contract_status']
+    search_fields = ["=client__company_name", 'client_id']
 
     def get_queryset(self):
         user = self.request.user
@@ -164,7 +165,7 @@ class EventViewset(DualSerializerViewSet, ModelViewSet):
     serializer_class = EventListSerializer
     permission_classes = [IsAuthenticated, IsManager | EventPermissions]
     detail_serializer_class = EventDetailSerializer
-    #TODO: add filter & search fileds
+    search_fields = ["=event__contract__client__company_name"]
 
     def get_queryset(self):
         if self.request.user.role == 3:
