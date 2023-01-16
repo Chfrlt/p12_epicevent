@@ -50,8 +50,6 @@ class ClientViewset(DualSerializerViewSet, ModelViewSet):
             queryset = Client.objects.all().order_by("id")
         elif self.request.user.role == User.SUPPORT:
             queryset = Client.objects.filter(contract__event__support_contact=self.request.user).distinct()
-        else:
-            queryset = Client.objects.all()
         return queryset
 
     def create(self, request):
@@ -105,7 +103,7 @@ class ContractViewset(DualSerializerViewSet, ModelViewSet):
     permission_classes = [IsAuthenticated, IsManager | ContractPermissions]
     detail_serializer_class = ContractDetailSerializer
     filterset_fields = ['contract_status']
-    search_fields = ["=client__company_name", 'client_id']
+    search_fields = ["=client__company_name"]
 
     def get_queryset(self):
         user = self.request.user
@@ -136,7 +134,6 @@ class ContractViewset(DualSerializerViewSet, ModelViewSet):
             client.save()
 
         serialized_data.save()
-
         return Response(serialized_data.data, status=status.HTTP_201_CREATED)
 
     def update(self, request, pk=None, **kwargs):
