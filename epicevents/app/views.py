@@ -4,8 +4,6 @@ from rest_framework import permissions, status, filters
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.exceptions import APIException
-
 from rest_framework.exceptions import ValidationError, NotFound
 from rest_framework.permissions import IsAuthenticated
 
@@ -112,12 +110,11 @@ class ContractViewset(DualSerializerViewSet, ModelViewSet):
     def get_queryset(self):
         user = self.request.user
 
-        if self.action == "list" and not user.is_superuser:
-            client = Client.objects.filter(sales_contact=user)
-            if client:
-                queryset = Contract.objects.filter(client__in=client)
-            else:
-                raise APIException("Aucun contrat trouvé")
+        if user.role == 3:
+            queryset = Contract.objects.filter(event__support_contact=self.request.user).distinct()
+            if not queryset:
+                raise NotFound("Aucun contrat trouvé")
+            return queryset
         else:
             queryset = Contract.objects.all()
 
