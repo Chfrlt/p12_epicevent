@@ -165,6 +165,7 @@ class EventViewset(DualSerializerViewSet, ModelViewSet):
     serializer_class = EventListSerializer
     permission_classes = [IsAuthenticated, IsManager | EventPermissions]
     detail_serializer_class = EventDetailSerializer
+    filterset_fields = ['event_status', "contract", "support_contact"]
     search_fields = ["=event__contract__client__company_name"]
 
     def get_queryset(self):
