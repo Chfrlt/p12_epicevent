@@ -120,21 +120,22 @@ class ContractViewset(DualSerializerViewSet, ModelViewSet):
 
         return queryset
 
-
     def create(self, request):
         data = request.data.copy()
-        data['client_status'] = True
 
         serialized_data = self.detail_serializer_class(data=data)
         serialized_data.is_valid(raise_exception=True)
-        serialized_data.save()
 
         client = get_object_or_404(Client, pk=serialized_data.data.get('client'))
-        if client.sales_contact is None and self.request.user.role == 2:
-            client.sales_contact = request.user
+        if client.sales_contact is None:
+            if self.request.user.role == 2:
+                client.sales_contact = request.user
+            elif 'sales_contact' not in data:
+                raise ValidationError("sales_contact: Ce champ est requis si vous ne faites pas partie de l'équipe de vente")
+            client.client_status = True
             client.save()
 
-        return Response(serialized_data.data)
+        serialized_data.save()
 
     def update(self, request, pk=None):
         
