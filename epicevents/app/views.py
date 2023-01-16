@@ -1,16 +1,20 @@
 from django.shortcuts import get_object_or_404
+from django.http import Http404
 from rest_framework import permissions, status, filters
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.exceptions import APIException
 
+from rest_framework.permissions import IsAuthenticated
 
 from .models import Client, Contract, Event
 from .serializers import (RegisterSerializer, ClientDetailSerializer,
                           ClientListSerializer, ContractDetailSerializer,
                           ContractListSerializer, EventDetailSerializer,
                           EventListSerializer)
+from .permissions import (IsManager, ClientPermissions,
+                          ContractPermissions, EventPermissions)
 
 
 class RegisterAPIView(APIView):
@@ -38,6 +42,7 @@ class DualSerializerViewSet(ModelViewSet):
 
 class ClientViewset(DualSerializerViewSet, ModelViewSet):
     serializer_class = ClientListSerializer
+    permission_classes = [IsAuthenticated, IsManager | ClientPermissions]
     detail_serializer_class = ClientDetailSerializer
     filterset_fields = ["client_status"]
     search_fields = ["company_name", "=client__sales_contact"]
@@ -57,6 +62,8 @@ class ClientViewset(DualSerializerViewSet, ModelViewSet):
 
 class ContractViewset(DualSerializerViewSet, ModelViewSet):
     serializer_class = ContractListSerializer
+    serializer_class = ContractListSerializer    
+    permission_classes = [IsAuthenticated, IsManager | ContractPermissions]
     detail_serializer_class = ContractDetailSerializer
     filterset_fields = ['contract_status']
 
@@ -105,6 +112,7 @@ class ContractViewset(DualSerializerViewSet, ModelViewSet):
 class EventViewset(DualSerializerViewSet, ModelViewSet):
 
     serializer_class = EventListSerializer
+    permission_classes = [IsAuthenticated, IsManager | EventPermissions]
     detail_serializer_class = EventDetailSerializer
     #TODO: add filter & search fileds
 
