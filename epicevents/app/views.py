@@ -187,3 +187,13 @@ class EventViewset(DualSerializerViewSet, ModelViewSet):
                 raise ValidationError('support_contact: Ce champ est requis')
         raise ValidationError('support_contact: Ce champ est requis')
     
+    def update(self, request, pk=None, **kwargs):
+
+        event = get_object_or_404(Event, pk=pk)
+        self.check_object_permissions(request, event)
+        serialized_data = self.detail_serializer_class(event, data=request.data, partial=True)
+        serialized_data.is_valid(raise_exception=True)
+        serialized_data.save()
+
+        return Response(serialized_data.data)
+
