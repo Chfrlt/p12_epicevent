@@ -7,7 +7,7 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.exceptions import ValidationError, NotFound
 from rest_framework.permissions import IsAuthenticated
 
-from .models import Client, Contract, Event
+from .models import Client, Contract, Event, User
 from .serializers import (RegisterSerializer, ClientDetailSerializer,
                           ClientListSerializer, ContractDetailSerializer,
                           ContractListSerializer, EventDetailSerializer,
@@ -46,10 +46,9 @@ class ClientViewset(DualSerializerViewSet, ModelViewSet):
     search_fields = ["=company_name", "=last_name"]
 
     def get_queryset(self):
-        if self.request.user.role == 2:
+        if self.request.user.role == User.SALES or self.request.user.role == User.MANAGER:
             queryset = Client.objects.all().order_by("id")
-            return queryset
-        elif self.request.user.role == 3:
+        elif self.request.user.role == User.SUPPORT:
             queryset = Client.objects.filter(contract__event__support_contact=self.request.user).distinct()
         else:
             queryset = Client.objects.all()
@@ -111,7 +110,7 @@ class ContractViewset(DualSerializerViewSet, ModelViewSet):
     def get_queryset(self):
         user = self.request.user
 
-        if user.role == 3:
+        if user.role == User.SUPPORT:
             queryset = Contract.objects.filter(event__support_contact=self.request.user).distinct()
             if not queryset:
                 raise NotFound("Aucun contrat trouvé")
@@ -129,7 +128,7 @@ class ContractViewset(DualSerializerViewSet, ModelViewSet):
 
         client = get_object_or_404(Client, pk=serialized_data.data.get('client'))
         if client.sales_contact is None:
-            if self.request.user.role == 2:
+            if self.request.user.role == User.SALES:
                 client.sales_contact = request.user
             elif 'sales_contact' not in data:
                 raise ValidationError("sales_contact: Ce champ est requis si vous ne faites pas partie de l'équipe de vente")
@@ -169,7 +168,7 @@ class EventViewset(DualSerializerViewSet, ModelViewSet):
     search_fields = ["=event__contract__client__company_name"]
 
     def get_queryset(self):
-        if self.request.user.role == 3:
+        if self.request.user.role == User.SUPPORT:
             queryset = Event.objects.filter(support_contact=self.request.user)
         else:
             queryset = Event.objects.all()
