@@ -175,4 +175,15 @@ class EventViewset(DualSerializerViewSet, ModelViewSet):
             return queryset
         raise NotFound("Aucun évènement trouvé")
 
-        return queryset
+    def create(self, request):
+        data = request.data.copy()
+        if 'support_contact' in data:
+            if data['support_contact']:
+                serialized_data = self.detail_serializer_class(data=data)
+                serialized_data.is_valid(raise_exception=True)
+                serialized_data.save()
+                return Response(serialized_data.data, status=status.HTTP_201_CREATED)
+            else:
+                raise ValidationError('support_contact: Ce champ est requis')
+        raise ValidationError('support_contact: Ce champ est requis')
+    
