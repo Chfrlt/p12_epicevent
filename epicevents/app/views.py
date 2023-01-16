@@ -93,6 +93,18 @@ class ClientViewset(DualSerializerViewSet, ModelViewSet):
 
         return Response(serialized_data.data)
 
+    def destroy(self, request, pk=None, *args, **kwargs):
+        client_inst = get_object_or_404(Client, pk=pk)
+        self.check_object_permissions(request, client_inst)
+        if Contract.objects.filter(client=client_inst):
+            raise ValidationError('Ce client est lié à un ou plusieurs contract(s). Action impossible')
+        try:
+            self.perform_destroy(client_inst)
+        except Http404:
+            pass
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class ContractViewset(DualSerializerViewSet, ModelViewSet):
     serializer_class = ContractListSerializer
