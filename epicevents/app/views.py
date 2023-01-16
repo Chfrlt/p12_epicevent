@@ -123,8 +123,7 @@ class ContractViewset(DualSerializerViewSet, ModelViewSet):
 
         serialized_data = self.detail_serializer_class(data=data)
         serialized_data.is_valid(raise_exception=True)
-
-        client = get_object_or_404(Client, pk=serialized_data.data.get('client'))
+        client = get_object_or_404(Client, pk=serialized_data.validated_data.get('client').id)
         if client.sales_contact is None:
             if self.request.user.role == User.SALES:
                 client.sales_contact = request.user
