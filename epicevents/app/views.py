@@ -167,11 +167,12 @@ class EventViewset(DualSerializerViewSet, ModelViewSet):
     #TODO: add filter & search fileds
 
     def get_queryset(self):
-        user = self.request.user
-
-        if self.action == "list" and not user.is_superuser:
-            queryset = Event.objects.filter(support_contact=user)
+        if self.request.user.role == 3:
+            queryset = Event.objects.filter(support_contact=self.request.user)
         else:
-            queryset = Event.objects.all()        
+            queryset = Event.objects.all()
+        if queryset:
+            return queryset
+        raise NotFound("Aucun évènement trouvé")
 
         return queryset
