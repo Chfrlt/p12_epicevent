@@ -20,7 +20,6 @@ from .permissions import (IsManager, ClientPermissions,
 
 class RegisterAPIView(APIView):
     serializer_class = RegisterSerializer
-    permission_classes = [permissions.IsAdminUser()]
     permission_classes = [permissions.IsAdminUser]
 
     def post(self, request):
@@ -50,12 +49,10 @@ class ClientViewset(DualSerializerViewSet, ModelViewSet):
 
     def get_queryset(self):
         if self.request.user.role == 2:
-            query = Client.objects.filter(sales_contact=self.request.user).order_by(
-                "id"
-            )
-            return query
+            queryset = Client.objects.all().order_by("id")
+            return queryset
         elif self.request.user.role == 3:
-            raise APIException("Vous n'avez pas l'autorisation d'acceder à cette requête")
+            queryset = Client.objects.filter(contract__event__support_contact=self.request.user).distinct()
         else:
             queryset = Client.objects.all()
         return queryset
