@@ -74,6 +74,25 @@ class ClientViewset(DualSerializerViewSet, ModelViewSet):
 
         return Response(serialized_data.data, status=status.HTTP_201_CREATED)
 
+    def update(self, request, pk=None, **kwargs):
+        client = get_object_or_404(Client, pk=pk)
+        self.check_object_permissions(request, client) 
+
+        serialized_data = self.detail_serializer_class(client, data=request.data, partial=True)
+        serialized_data.is_valid(raise_exception=True)
+        if 'client_status' in serialized_data.validated_data:
+            raise ValidationError('Impossible: cette donnée se met à jour automatiquement.')
+        if 'sales_contact' in serialized_data.validated_data:
+            if serialized_data.validated_data['sales_contact']:
+                serialized_data.validated_data['client_status'] = True
+            else:
+                serialized_data.validated_data['client_status'] = False
+            serialized_data.save()
+        else:
+            serialized_data.save()
+
+        return Response(serialized_data.data)
+
 
 class ContractViewset(DualSerializerViewSet, ModelViewSet):
     serializer_class = ContractListSerializer
