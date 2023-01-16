@@ -6,6 +6,7 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.exceptions import APIException
 
+from rest_framework.exceptions import ValidationError, NotFound
 from rest_framework.permissions import IsAuthenticated
 
 from .models import Client, Contract, Event
@@ -58,6 +59,20 @@ class ClientViewset(DualSerializerViewSet, ModelViewSet):
         else:
             queryset = Client.objects.all()
         return queryset
+
+    def create(self, request):
+        data = request.data.copy()
+
+        serialized_data = self.detail_serializer_class(data=data)
+        serialized_data.is_valid(raise_exception=True)
+        serialized_data.save()
+
+        client = get_object_or_404(Client, pk=serialized_data.data.get('id'))
+        if client.sales_contact is not None:
+            client.client_status = True
+            client.save()
+
+        return Response(serialized_data.data, status=status.HTTP_201_CREATED)
 
 
 class ContractViewset(DualSerializerViewSet, ModelViewSet):
