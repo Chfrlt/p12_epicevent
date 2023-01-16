@@ -107,7 +107,6 @@ class ClientViewset(DualSerializerViewSet, ModelViewSet):
 
 
 class ContractViewset(DualSerializerViewSet, ModelViewSet):
-    serializer_class = ContractListSerializer
     serializer_class = ContractListSerializer    
     permission_classes = [IsAuthenticated, IsManager | ContractPermissions]
     detail_serializer_class = ContractDetailSerializer
