@@ -197,3 +197,11 @@ class EventViewset(DualSerializerViewSet, ModelViewSet):
 
         return Response(serialized_data.data)
 
+    def destroy(self, request, pk=None, *args, **kwargs):
+        event_inst = get_object_or_404(Event, pk=pk)
+        self.check_object_permissions(request, event_inst)
+        try:
+            self.perform_destroy(event_inst)
+        except Http404:
+            pass
+        return Response(status=status.HTTP_204_NO_CONTENT)
