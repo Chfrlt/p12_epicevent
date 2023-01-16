@@ -45,5 +45,19 @@ class ContractPermissions(permissions.BasePermission):
                     r = False
                 return r
 
+
+class EventPermissions(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if request.method == 'POST':
+            return request.user.role == 2
+        return request.user.role == 3 or request.user.role == 2
+
     def has_object_permission(self, request, view, obj):
-        return (request.user.role == 1)
+        if request.method in permissions.SAFE_METHODS:
+            return (request.user == obj.support_contact
+                    or request.user == 2)
+        if request.method in ('PATCH', 'PUT'):
+            if obj.event_status is True:
+                raise PermissionDenied("L'évènement est terminé!")
+            else:
+                return request.user == obj.contract.client.sales_contact
