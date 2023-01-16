@@ -137,14 +137,15 @@ class ContractViewset(DualSerializerViewSet, ModelViewSet):
 
         serialized_data.save()
 
-    def update(self, request, pk=None):
-        
-        contract = get_object_or_404(Contract, pk=pk)
+        return Response(serialized_data.data, status=status.HTTP_201_CREATED)
 
-        if contract.client.sales_contact == self.request.user:
-            serialized_data = self.detail_serializer_class(contract, data=request.data, partial=True)
-            serialized_data.is_valid(raise_exception=True)
-            serialized_data.save()
+    def update(self, request, pk=None, **kwargs):
+
+        contract = get_object_or_404(Contract, pk=pk)
+        self.check_object_permissions(request, contract)
+        serialized_data = self.detail_serializer_class(contract, data=request.data, partial=True)
+        serialized_data.is_valid(raise_exception=True)
+        serialized_data.save()
 
         return Response(serialized_data.data)
 
