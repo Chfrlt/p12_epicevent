@@ -42,8 +42,8 @@ class ClientViewset(DualSerializerViewSet, ModelViewSet):
     serializer_class = ClientListSerializer
     permission_classes = [IsAuthenticated, IsManager | ClientPermissions]
     detail_serializer_class = ClientDetailSerializer
-    filterset_fields = ["client_status"]
-    search_fields = ["=company_name", "=last_name"]
+    filterset_fields = ['client_status', 'company_name', 'email']
+    search_fields = ['^company_name']
 
     def get_queryset(self):
         if self.request.user.role == User.SALES or self.request.user.role == User.MANAGER:
@@ -102,8 +102,8 @@ class ContractViewset(DualSerializerViewSet, ModelViewSet):
     serializer_class = ContractListSerializer    
     permission_classes = [IsAuthenticated, IsManager | ContractPermissions]
     detail_serializer_class = ContractDetailSerializer
-    filterset_fields = ['contract_status']
-    search_fields = ["=client__company_name"]
+    filterset_fields = ['contract_status', 'client__company_name', 'client__email', 'amount', 'date_created']
+    search_fields = ['^client__company_name', '$date_created']
 
     def get_queryset(self):
         user = self.request.user
@@ -160,8 +160,8 @@ class EventViewset(DualSerializerViewSet, ModelViewSet):
     serializer_class = EventListSerializer
     permission_classes = [IsAuthenticated, IsManager | EventPermissions]
     detail_serializer_class = EventDetailSerializer
-    filterset_fields = ['event_status', "contract", "support_contact"]
-    search_fields = ["=event__contract__client__company_name"]
+    filterset_fields = ['event_status', 'event_date', 'contract__client__company_name', 'contract__client__email']
+    search_fields = ['$event_date', '^contract__client__company_name', '=contract__client__email']
 
     def get_queryset(self):
         if self.request.user.role == User.SUPPORT:
