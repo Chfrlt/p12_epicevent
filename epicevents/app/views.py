@@ -131,8 +131,11 @@ class ContractViewset(DualSerializerViewSet, ModelViewSet):
                 raise ValidationError("sales_contact: Ce champ est requis si vous ne faites pas partie de l'équipe de vente")
             client.client_status = True
             client.save()
+        elif self.request.user.role != User.MANAGER and client.sales_contact != self.request.user:
+            raise PermissionError("Vous ne pouvez créer un contrat auprès d'un client auquel un autre utilisateur est attaché")
 
         serialized_data.save()
+
         return Response(serialized_data.data, status=status.HTTP_201_CREATED)
 
     def update(self, request, pk=None, **kwargs):
