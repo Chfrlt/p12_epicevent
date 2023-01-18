@@ -46,10 +46,12 @@ class ClientViewset(DualSerializerViewSet, ModelViewSet):
     search_fields = ['^company_name']
 
     def get_queryset(self):
-        if self.request.user.role == User.SALES or self.request.user.role == User.MANAGER:
+        if self.request.user.role == User.MANAGER or self.request.user.role == User.SALES:
             queryset = Client.objects.all().order_by("id")
         elif self.request.user.role == User.SUPPORT:
             queryset = Client.objects.filter(contract__event__support_contact=self.request.user).distinct()
+        if not queryset:
+            raise NotFound('Aucun client trouvé')
         return queryset
 
     def create(self, request):
@@ -106,16 +108,14 @@ class ContractViewset(DualSerializerViewSet, ModelViewSet):
     search_fields = ['^client__company_name', '$date_created']
 
     def get_queryset(self):
-        user = self.request.user
-
-        if user.role == User.SUPPORT:
-            queryset = Contract.objects.filter(event__support_contact=self.request.user).distinct()
-            if not queryset:
-                raise NotFound("Aucun contrat trouvé")
-            return queryset
-        else:
+        if self.request.user.role == User.MANAGER:
             queryset = Contract.objects.all()
-
+        if self.request.user.role == User.SALES:
+            queryset = Contract.objects.filter(sales_contact=self.request.user)
+        if self.request.user.role == User.SUPPORT:
+            raise PermissionError('You do not have permission')
+        if not queryset:
+            raise NotFound("Aucun contrat trouvé")
         return queryset
 
     def create(self, request):
@@ -164,13 +164,15 @@ class EventViewset(DualSerializerViewSet, ModelViewSet):
     search_fields = ['$event_date', '^contract__client__company_name', '=contract__client__email']
 
     def get_queryset(self):
+        if self.request.user.role == User.MANAGER:
+            queryset = Event.objects.all()
+        if self.request.user.role == User.SALES:
+            raise PermissionError('You do not have permission')
         if self.request.user.role == User.SUPPORT:
             queryset = Event.objects.filter(support_contact=self.request.user)
-        else:
-            queryset = Event.objects.all()
-        if queryset:
-            return queryset
-        raise NotFound("Aucun évènement trouvé")
+        if not queryset:
+            raise NotFound("Aucun évènement trouvé")
+        return queryset
 
     def create(self, request):
         data = request.data.copy()
