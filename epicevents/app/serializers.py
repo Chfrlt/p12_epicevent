@@ -66,7 +66,7 @@ class ContractDetailSerializer(ModelSerializer):
 class ContractListSerializer(ModelSerializer):
     class Meta:
         model = Contract
-        fields = ["id", "client", "contract_status"]
+        fields = ["id", "client", "contract_status", 'amount']
 
 
 class EventDetailSerializer(ModelSerializer):
@@ -78,5 +78,4 @@ class EventDetailSerializer(ModelSerializer):
 class EventListSerializer(ModelSerializer):
     class Meta:
         model = Event
-        fields = ["id", "contract", "support_contact", "event_status"]
-
+        fields = ["id", "contract", "support_contact", "event_status", 'event_date']
