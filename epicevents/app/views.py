@@ -4,7 +4,7 @@ from rest_framework import permissions, status, filters
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.exceptions import ValidationError, NotFound
+from rest_framework.exceptions import ValidationError, NotFound, PermissionDenied
 from rest_framework.permissions import IsAuthenticated
 
 from .models import Client, Contract, Event, User
@@ -113,7 +113,7 @@ class ContractViewset(DualSerializerViewSet, ModelViewSet):
         if self.request.user.role == User.SALES:
             queryset = Contract.objects.filter(sales_contact=self.request.user)
         if self.request.user.role == User.SUPPORT:
-            raise PermissionError('You do not have permission')
+            raise PermissionDenied('You do not have permission')
         if not queryset:
             raise NotFound("Aucun contrat trouvé")
         return queryset
@@ -132,7 +132,7 @@ class ContractViewset(DualSerializerViewSet, ModelViewSet):
             client.client_status = True
             client.save()
         elif self.request.user.role != User.MANAGER and client.sales_contact != self.request.user:
-            raise PermissionError("Vous ne pouvez créer un contrat auprès d'un client auquel un autre utilisateur est attaché")
+            raise PermissionDenied("Vous ne pouvez créer un contrat auprès d'un client auquel un autre utilisateur est attaché")
 
         serialized_data.save()
 
@@ -167,10 +167,10 @@ class EventViewset(DualSerializerViewSet, ModelViewSet):
     search_fields = ['$event_date', '^contract__client__company_name', '=contract__client__email']
 
     def get_queryset(self):
-        if self.request.user.role == User.MANAGER:
+        if self.request.user.role == User.MANAGER or self.request.user.role == User.SALES:
             queryset = Event.objects.all()
         if self.request.user.role == User.SALES:
-            raise PermissionError('You do not have permission')
+            raise PermissionDenied('You do not have permission')
         if self.request.user.role == User.SUPPORT:
             queryset = Event.objects.filter(support_contact=self.request.user)
         if not queryset:

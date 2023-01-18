@@ -40,3 +40,51 @@ Traceback (most recent call last):
     raise ValueError(
 ValueError: Cannot query "Support_user": Must be "Contract" instance.
 "GET /api/contracts/ HTTP/1.1" 500 145
+Internal Server Error: /api/events/
+Traceback (most recent call last):
+  File "C:\Users\charl\Documents\GitHub\p12_v2\env\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\charl\Documents\GitHub\p12_v2\env\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\charl\Documents\GitHub\p12_v2\env\lib\site-packages\django\views\decorators\csrf.py", line 54, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "C:\Users\charl\Documents\GitHub\p12_v2\env\lib\site-packages\rest_framework\viewsets.py", line 125, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\charl\Documents\GitHub\p12_v2\env\lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "C:\Users\charl\Documents\GitHub\p12_v2\env\lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "C:\Users\charl\Documents\GitHub\p12_v2\env\lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\charl\Documents\GitHub\p12_v2\env\lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "C:\Users\charl\Documents\GitHub\p12_v2\env\lib\site-packages\rest_framework\mixins.py", line 38, in list
+    queryset = self.filter_queryset(self.get_queryset())
+  File "C:\Users\charl\Documents\GitHub\p12_v2\epicevents\app\views.py", line 173, in get_queryset
+    raise PermissionError('You do not have permission')
+PermissionError: You do not have permission
+"GET /api/events/ HTTP/1.1" 500 145
+Internal Server Error: /api/events/
+Traceback (most recent call last):
+  File "C:\Users\charl\Documents\GitHub\p12_v2\env\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\charl\Documents\GitHub\p12_v2\env\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\charl\Documents\GitHub\p12_v2\env\lib\site-packages\django\views\decorators\csrf.py", line 54, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "C:\Users\charl\Documents\GitHub\p12_v2\env\lib\site-packages\rest_framework\viewsets.py", line 125, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\charl\Documents\GitHub\p12_v2\env\lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "C:\Users\charl\Documents\GitHub\p12_v2\env\lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "C:\Users\charl\Documents\GitHub\p12_v2\env\lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\charl\Documents\GitHub\p12_v2\env\lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "C:\Users\charl\Documents\GitHub\p12_v2\env\lib\site-packages\rest_framework\mixins.py", line 38, in list
+    queryset = self.filter_queryset(self.get_queryset())
+  File "C:\Users\charl\Documents\GitHub\p12_v2\epicevents\app\views.py", line 173, in get_queryset
+    raise PermissionError('You do not have permission')
+PermissionError: You do not have permission
+"GET /api/events/ HTTP/1.1" 500 145
