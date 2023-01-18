@@ -176,16 +176,17 @@ class EventViewset(DualSerializerViewSet, ModelViewSet):
 
     def create(self, request):
         data = request.data.copy()
-        if 'support_contact' in data:
-            if data['support_contact']:
-                serialized_data = self.detail_serializer_class(data=data)
-                serialized_data.is_valid(raise_exception=True)
-                serialized_data.save()
-                return Response(serialized_data.data, status=status.HTTP_201_CREATED)
-            else:
-                raise ValidationError('support_contact: Ce champ est requis')
-        raise ValidationError('support_contact: Ce champ est requis')
-    
+        try:
+            data['support_contact']
+        except KeyError:
+            raise ValidationError('support_contact: Ce champ est requis')
+        serialized_data = self.detail_serializer_class(data=data)
+        serialized_data.is_valid(raise_exception=True)
+        if Contract.objects.get(pk=data['contract']).contract_status is False:
+            raise ValidationError("Impossible: Le contrat n'est pas signé")
+        serialized_data.save()
+        return Response(serialized_data.data, status=status.HTTP_201_CREATED)
+
     def update(self, request, pk=None, **kwargs):
 
         event = get_object_or_404(Event, pk=pk)
