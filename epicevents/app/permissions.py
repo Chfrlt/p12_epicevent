@@ -19,8 +19,15 @@ class ClientPermissions(permissions.BasePermission):
         return request.user.role == User.SUPPORT or request.user.role == User.SALES
 
     def has_object_permission(self, request, view, obj):
-        if request.method in ('PATCH', 'PUT') or request.method in permissions.SAFE_METHODS:
+        if request.method in permissions.SAFE_METHODS:
             if request.user.role == User.SALES:
+                return True
+            if request.user.role == User.SUPPORT:
+                return (obj in [c for c in Client.objects
+                                              .filter(contract__event__support_contact=request.user)])
+        if request.method in ('PATCH', 'PUT'):
+            if request.user.role == User.SALES:
+                if not obj.sales_contact or obj.sales_contact == request.user:
                     return True
             if request.user.role == User.SUPPORT:
                 return (obj in [c for c in Client.objects
