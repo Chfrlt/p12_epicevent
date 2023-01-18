@@ -80,7 +80,7 @@ class Client(models.Model):
     company_name = models.CharField(max_length=250, blank=False)
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
-    client_status = models.BooleanField(default=False, verbose_name="Contracted")
+    client_status = models.BooleanField(default=False, verbose_name="Converted")
 
 
 class Contract(models.Model):
